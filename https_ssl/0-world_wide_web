@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # Function to get and display the subdomain record
 get_subdomain_info() {
   subdomain=$1
