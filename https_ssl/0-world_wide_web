@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Function to get and display the subdomain record
+get_subdomain_info() {
+  subdomain=$1
+  domain=$2
+  result=$(dig +short "$subdomain.$domain")
+  
+  if [[ -z "$result" ]]; then
+    echo "No record found for $subdomain.$domain"
+  else
+    echo "The subdomain $subdomain is a A record and points to $result"
+  fi
+}
+
+# Check if the domain argument is provided
+if [[ -z "$1" ]]; then
+  echo "Domain is required."
+  exit 1
+fi
+
+# Get domain and subdomain arguments
+domain=$1
+subdomain=$2
+
+# When only the domain is provided, display information for default subdomains
+if [[ -z "$subdomain" ]]; then
+  get_subdomain_info "www" "$domain"
+  get_subdomain_info "lb-01" "$domain"
+  get_subdomain_info "web-01" "$domain"
+  get_subdomain_info "web-02" "$domain"
+else
+  # Display information for the specific subdomain
+  get_subdomain_info "$subdomain" "$domain"
+fi
