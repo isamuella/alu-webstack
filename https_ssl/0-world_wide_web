@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 # Script that displays the subdomain record
 
-get_subdomain_info() {
-  local subdomain=$1
-  local domain=$2
+function get_subdomain_info {
+  local domain=$1
+  local subdomain=$2
   local full_domain="${subdomain}.${domain}"
 
   local result=$(dig +noall +answer ${full_domain} | awk '{print $4, $5}')
   local record_type=$(echo $result | awk '{print $1}')
   local ip_address=$(echo $result | awk '{print $2}')
 
-  echo "The subdomain $subdomain is a $record_type and points to $ip_address"
+  echo "The subdomain ${subdomain} is a ${record_type} record and points to ${ip_address}"
 }
  
 domain=$1
@@ -21,5 +21,5 @@ if [[ -z "$subdomain" ]]; then
     get_subdomain_info $domain $sub
   done
 else
-  get_subdomain_info "$subdomain" "$domain"
+  get_subdomain_info "$domain" "$subdomain"
 fi
