@@ -1,34 +1,25 @@
-#!/usr/bin/env bash
-# Function to get and display the subdomain record
+#!/bin/env bash
+# Script that displays the subdomain record
+
 get_subdomain_info() {
-  subdomain=$1
-  domain=$2
-  result=$(dig +short "$subdomain.$domain")
-  
-  if [[ -z "$result" ]]; then
-    echo "No record found for $subdomain.$domain"
-  else
-    echo "The subdomain $subdomain is a A record and points to $result"
-  fi
+  local subdomain=$1
+  local domain=$2
+  local full_domain="${subdomain}.${domain}"
+
+  local result=$(dig +noall +answer ${full_domain} | awk '{print $4, $5}')
+  local record_type=$(echo $result | awk '{print $1}')
+  local ip_address=$(echo $result | awk '{print $2}')
+
+  echo "The subdomain $subdomain is a $record_type and points to $ip_address"
 }
-
-# Check if the domain argument is provided
-if [[ -z "$1" ]]; then
-  echo "Domain is required."
-  exit 1
-fi
-
-# Get domain and subdomain arguments
+ 
 domain=$1
 subdomain=$2
 
-# When only the domain is provided, display information for default subdomains
 if [[ -z "$subdomain" ]]; then
-  get_subdomain_info "www" "$domain"
-  get_subdomain_info "lb-01" "$domain"
-  get_subdomain_info "web-01" "$domain"
-  get_subdomain_info "web-02" "$domain"
+  for sub in www lb-01 web-01 web-02; do
+    get_subdomain_info $domain $sub
+  done
 else
-  # Display information for the specific subdomain
   get_subdomain_info "$subdomain" "$domain"
 fi
