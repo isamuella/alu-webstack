@@ -1,4 +1,5 @@
-global
+defaults
+        log     global
         mode    http
         option  httplog
         option  dontlognull
@@ -13,17 +14,16 @@ global
         errorfile 503 /etc/haproxy/errors/503.http
         errorfile 504 /etc/haproxy/errors/504.http
 
-frontend lb_frontend
+frontend www-https
+        bind *:443 ssl crt /etc/haproxy/certs/isamuella.pem
+        http-request add-header X-Forwarded-Proto https
+        default_backend web-backend
+
+frontend www-http
         bind *:80
-        reqadd X-Forwarded-Proto:\ http
-        default_backend web_servers
+        redirect scheme https if !{ ssl_fc }
 
-frontend https-frontend
-        bind *:443 ssl crt /etc/haproxy/certificate/www.isamuella.tech.pem
-        reqadd X-Forwarded-Proto:\ https
-        default_backend web_servers
-
-backend web_servers
+backend web-backend
         balance roundrobin
-        server web-01 44.203.2.87 check
-        server web-02 3.83.161.239 check
+        server web-01 44.203.2.87:80 check
+        server web-02 3.83.161.239:80 check
